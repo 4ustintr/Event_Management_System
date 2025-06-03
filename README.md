@@ -1,5 +1,3 @@
-Repository này dùng để làm base cho project nodejs express
-
 Sau khi clone install node_modules bằng câu lệnh:
     npm install
 

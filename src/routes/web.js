@@ -1,10 +1,12 @@
 const express = require('express');
 const router = express.Router();
-const {
-    register, login, getClubs, createClub,
-    getEvents, createEvent, registerForEvent, submitFeedback,
-    createNotification, getUsers
-} = require('../controllers/homeController');
+
+// Import từ các controller chuyên biệt
+const { register, login } = require('../controllers/authController');
+const { getClubs, createClub } = require('../controllers/clubController');
+const { getEvents, createEvent, registerForEvent, submitFeedback } = require('../controllers/eventController');
+const { createNotification } = require('../controllers/notificationController');
+const { getUsers } = require('../controllers/userController');
 
 const { auth, authorize } = require('../middleware/auth');
 

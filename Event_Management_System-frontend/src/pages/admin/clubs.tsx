@@ -6,7 +6,6 @@ import { useRouter } from "next/router";
 import { clubService } from "@/api/services/club.service";
 import { Club } from "@/types/api.types";
 
-
 const { Search } = Input;
 
 const ClubManagement = () => {
@@ -15,6 +14,7 @@ const ClubManagement = () => {
   const [loading, setLoading] = useState(true);
   const [clubs, setClubs] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
+  const [messageApi, contextHolder] = message.useMessage();
 
   useEffect(() => {
     if (userRole !== "admin") {
@@ -32,11 +32,17 @@ const ClubManagement = () => {
       if (response.success) {
         setClubs(response.data.clubs);
       } else {
-        message.error("Không thể tải danh sách CLB");
+        messageApi.open({
+          type: "error",
+          content: "Không thể tải danh sách CLB",
+        });
       }
     } catch (error) {
       console.error("Error fetching clubs:", error);
-      message.error("Có lỗi xảy ra khi tải danh sách CLB");
+      messageApi.open({
+        type: "error",
+        content: "Có lỗi xảy ra khi tải danh sách CLB",
+      });
     } finally {
       setLoading(false);
     }
@@ -46,14 +52,23 @@ const ClubManagement = () => {
     try {
       const response = await clubService.deleteClub(clubId);
       if (response.success) {
-        message.success("Xóa CLB thành công");
+        messageApi.open({
+          type: "success",
+          content: "Xóa CLB thành công",
+        });
         fetchClubs();
       } else {
-        message.error(response.message || "Không thể xóa CLB");
+        messageApi.open({
+          type: "error",
+          content: response.message || "Không thể xóa CLB",
+        });
       }
     } catch (error) {
       console.error("Error deleting club:", error);
-      message.error("Có lỗi xảy ra khi xóa CLB");
+      messageApi.open({
+        type: "error",
+        content: "Có lỗi xảy ra khi xóa CLB",
+      });
     }
   };
 
@@ -110,7 +125,7 @@ const ClubManagement = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 py-8">
-
+      {contextHolder}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center mb-8">
           <h1 className="text-3xl font-bold text-gray-900">Quản lý CLB</h1>

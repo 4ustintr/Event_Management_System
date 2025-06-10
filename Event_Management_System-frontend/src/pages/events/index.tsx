@@ -33,6 +33,7 @@ const EventsPage = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("");
   const [selectedStatus, setSelectedStatus] = useState("");
+  const [messageApi, contextHolder] = message.useMessage();
 
   const fetchEvents = async () => {
     try {
@@ -53,12 +54,18 @@ const EventsPage = () => {
         setEvents(response.data.events);
       } else {
         console.error("Invalid response format:", response);
-        message.error("Không thể tải danh sách sự kiện");
+        messageApi.open({
+          type: "error",
+          content: "Không thể tải danh sách sự kiện",
+        });
         setEvents([]);
       }
     } catch (error) {
       console.error("Error fetching events:", error);
-      message.error("Có lỗi xảy ra khi tải danh sách sự kiện");
+      messageApi.open({
+        type: "error",
+        content: "Có lỗi xảy ra khi tải danh sách sự kiện",
+      });
       setEvents([]);
     } finally {
       setLoading(false);
@@ -119,6 +126,7 @@ const EventsPage = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 py-8">
+      {contextHolder}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center mb-8">
           <h1 className="text-3xl font-bold text-gray-900">
@@ -203,7 +211,7 @@ const EventsPage = () => {
                       {getStatusText(event.status)}
                     </Tag>
                   </div>
-                  
+
                   <div className="space-y-2">
                     <div className="flex items-center text-gray-500">
                       <CalendarOutlined className="mr-2" />

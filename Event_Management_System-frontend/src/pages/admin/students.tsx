@@ -6,7 +6,6 @@ import { useRouter } from "next/router";
 import { userService } from "@/api/services/user.service";
 import { User } from "@/types/api.types";
 
-
 const { Search } = Input;
 
 const StudentManagement = () => {
@@ -15,6 +14,7 @@ const StudentManagement = () => {
   const [loading, setLoading] = useState(true);
   const [students, setStudents] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
+  const [messageApi, contextHolder] = message.useMessage();
 
   useEffect(() => {
     if (userRole !== "admin") {
@@ -32,11 +32,17 @@ const StudentManagement = () => {
       if (response.success) {
         setStudents(response.data.users);
       } else {
-        message.error("Không thể tải danh sách sinh viên");
+        messageApi.open({
+          type: "error",
+          content: "Không thể tải danh sách sinh viên",
+        });
       }
     } catch (error) {
       console.error("Error fetching students:", error);
-      message.error("Có lỗi xảy ra khi tải danh sách sinh viên");
+      messageApi.open({
+        type: "error",
+        content: "Có lỗi xảy ra khi tải danh sách sinh viên",
+      });
     } finally {
       setLoading(false);
     }
@@ -46,14 +52,23 @@ const StudentManagement = () => {
     try {
       const response = await userService.deleteUser(studentId);
       if (response.success) {
-        message.success("Xóa sinh viên thành công");
+        messageApi.open({
+          type: "success",
+          content: "Xóa sinh viên thành công",
+        });
         fetchStudents();
       } else {
-        message.error(response.message || "Không thể xóa sinh viên");
+        messageApi.open({
+          type: "error",
+          content: response.message || "Không thể xóa sinh viên",
+        });
       }
     } catch (error) {
       console.error("Error deleting student:", error);
-      message.error("Có lỗi xảy ra khi xóa sinh viên");
+      messageApi.open({
+        type: "error",
+        content: "Có lỗi xảy ra khi xóa sinh viên",
+      });
     }
   };
 
@@ -110,7 +125,7 @@ const StudentManagement = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-
+      {contextHolder}
       <main className="container mx-auto px-4 py-8">
         <div className="bg-white p-6 rounded-lg shadow-sm">
           <h1 className="text-2xl font-bold mb-6">

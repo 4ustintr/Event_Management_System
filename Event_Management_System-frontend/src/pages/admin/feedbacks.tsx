@@ -11,6 +11,7 @@ const FeedbackManagementPage = () => {
   const { userRole } = useAuth();
   const [loading, setLoading] = useState(true);
   const [feedbacks, setFeedbacks] = useState<any[]>([]);
+  const [messageApi, contextHolder] = message.useMessage();
 
   useEffect(() => {
     if (userRole !== "admin") {
@@ -28,11 +29,17 @@ const FeedbackManagementPage = () => {
       if (response.success) {
         setFeedbacks(response.data.feedbacks);
       } else {
-        message.error("Không thể tải danh sách đánh giá");
+        messageApi.open({
+          type: "error",
+          content: "Không thể tải danh sách đánh giá",
+        });
       }
     } catch (error) {
       console.error("Error fetching feedbacks:", error);
-      message.error("Đã xảy ra lỗi khi tải danh sách đánh giá");
+      messageApi.open({
+        type: "error",
+        content: "Đã xảy ra lỗi khi tải danh sách đánh giá",
+      });
     } finally {
       setLoading(false);
     }
@@ -42,14 +49,23 @@ const FeedbackManagementPage = () => {
     try {
       const response = await feedbackService.deleteFeedback(feedbackId);
       if (response.success) {
-        message.success("Xóa đánh giá thành công");
+        messageApi.open({
+          type: "success",
+          content: "Xóa đánh giá thành công",
+        });
         fetchFeedbacks();
       } else {
-        message.error("Không thể xóa đánh giá");
+        messageApi.open({
+          type: "error",
+          content: "Không thể xóa đánh giá",
+        });
       }
     } catch (error) {
       console.error("Error deleting feedback:", error);
-      message.error("Đã xảy ra lỗi khi xóa đánh giá");
+      messageApi.open({
+        type: "error",
+        content: "Đã xảy ra lỗi khi xóa đánh giá",
+      });
     }
   };
 
@@ -113,7 +129,7 @@ const FeedbackManagementPage = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
-
+      {contextHolder}
       <div className="flex-grow">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="flex justify-between items-center mb-8">

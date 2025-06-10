@@ -24,16 +24,23 @@ const AdminDashboard = () => {
     totalEvents: 0,
     totalFeedbacks: 0,
   });
+  const [messageApi, contextHolder] = message.useMessage();
 
   useEffect(() => {
     if (!isAuthenticated) {
-      message.error("Vui lòng đăng nhập để truy cập trang admin");
+      messageApi.open({
+        type: "error",
+        content: "Vui lòng đăng nhập để truy cập trang admin",
+      });
       router.replace("/login");
       return;
     }
 
     if (userRole !== "admin") {
-      message.error("Bạn không có quyền truy cập trang admin");
+      messageApi.open({
+        type: "error",
+        content: "Bạn không có quyền truy cập trang admin",
+      });
       router.replace("/");
       return;
     }
@@ -57,7 +64,10 @@ const AdminDashboard = () => {
         });
       } catch (error) {
         console.error("Error fetching stats:", error);
-        message.error("Không thể tải thống kê. Vui lòng thử lại sau.");
+        messageApi.open({
+          type: "error",
+          content: "Không thể tải thống kê. Vui lòng thử lại sau.",
+        });
       } finally {
         setLoading(false);
       }
@@ -76,6 +86,7 @@ const AdminDashboard = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
+      {contextHolder}
       <AdminHeader />
       <div className="flex-grow">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">

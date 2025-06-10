@@ -27,16 +27,23 @@ const ClubDashboard = () => {
   const { userRole, isAuthenticated, user } = useAuth();
   const [events, setEvents] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [messageApi, contextHolder] = message.useMessage();
 
   useEffect(() => {
     if (!isAuthenticated) {
-      message.error("Vui lòng đăng nhập để truy cập trang này");
+      messageApi.open({
+        type: "error",
+        content: "Vui lòng đăng nhập để truy cập trang này",
+      });
       router.push("/login");
       return;
     }
 
     if (userRole !== "club") {
-      message.error("Bạn không có quyền truy cập trang này");
+      messageApi.open({
+        type: "error",
+        content: "Bạn không có quyền truy cập trang này",
+      });
       router.push("/");
       return;
     }
@@ -48,7 +55,10 @@ const ClubDashboard = () => {
     try {
       setLoading(true);
       if (!user) {
-        message.error("Không tìm thấy thông tin club");
+        messageApi.open({
+          type: "error",
+          content: "Không tìm thấy thông tin club",
+        });
         return;
       }
 
@@ -58,12 +68,18 @@ const ClubDashboard = () => {
       if (response && response.success && Array.isArray(response.data.events)) {
         setEvents(response.data.events);
       } else {
-        message.error("Không thể tải danh sách sự kiện");
+        messageApi.open({
+          type: "error",
+          content: "Không thể tải danh sách sự kiện",
+        });
         setEvents([]);
       }
     } catch (error) {
       console.error("Error fetching events:", error);
-      message.error("Có lỗi xảy ra khi tải danh sách sự kiện");
+      messageApi.open({
+        type: "error",
+        content: "Có lỗi xảy ra khi tải danh sách sự kiện",
+      });
       setEvents([]);
     } finally {
       setLoading(false);
@@ -125,6 +141,7 @@ const ClubDashboard = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      {contextHolder}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="flex justify-between items-center mb-8">
           <h1 className="text-3xl font-bold text-gray-900">

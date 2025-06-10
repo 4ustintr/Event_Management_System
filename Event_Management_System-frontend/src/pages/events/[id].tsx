@@ -53,6 +53,7 @@ const EventDetailPage = () => {
   const [editForm] = Form.useForm();
   const [fileList, setFileList] = useState<UploadFile[]>([]);
   const [uploading, setUploading] = useState(false);
+  const [messageApi, contextHolder] = message.useMessage();
 
   const fetchEventDetails = async () => {
     if (!id) {
@@ -77,12 +78,18 @@ const EventDetailPage = () => {
         }
       } else {
         console.error("Debug - Invalid event data:", response);
-        message.error("Không thể tải thông tin sự kiện");
+        messageApi.open({
+          type: "error",
+          content: "Không thể tải thông tin sự kiện",
+        });
         router.replace("/events");
       }
     } catch (error) {
       console.error("Debug - Error fetching event details:", error);
-      message.error("Đã xảy ra lỗi khi tải thông tin sự kiện");
+      messageApi.open({
+        type: "error",
+        content: "Đã xảy ra lỗi khi tải thông tin sự kiện",
+      });
       router.replace("/events");
     } finally {
       setLoading(false);
@@ -134,7 +141,10 @@ const EventDetailPage = () => {
 
   const handleRegister = async () => {
     if (!isAuthenticated) {
-      message.warning("Vui lòng đăng nhập để đăng ký sự kiện");
+      messageApi.open({
+        type: "warning",
+        content: "Vui lòng đăng nhập để đăng ký sự kiện",
+      });
       router.push({
         pathname: "/login",
         query: { returnUrl: `/events/${id}` },
@@ -143,26 +153,39 @@ const EventDetailPage = () => {
     }
 
     if (userRole !== "student") {
-      message.error("Chỉ sinh viên mới có thể đăng ký sự kiện");
+      messageApi.open({
+        type: "error",
+        content: "Chỉ sinh viên mới có thể đăng ký sự kiện",
+      });
       return;
     }
 
     try {
       if (!id) {
-        message.error("Không tìm thấy thông tin sự kiện");
+        messageApi.open({
+          type: "error",
+          content: "Không tìm thấy thông tin sự kiện",
+        });
         return;
       }
       const response = await eventService.registerForEvent(id);
       if (response.success) {
-        message.success("Đăng ký thành công!");
+        messageApi.open({
+          type: "success",
+          content: "Đăng ký thành công!",
+        });
         fetchEventDetails();
       } else {
-        message.error(response.message || "Đăng ký sự kiện thất bại");
+        messageApi.open({
+          type: "error",
+          content: response.message || "Đăng ký sự kiện thất bại",
+        });
       }
     } catch (error: any) {
-      message.error(
-        error.response?.data?.message || "Đăng ký sự kiện thất bại"
-      );
+      messageApi.open({
+        type: "error",
+        content: error.response?.data?.message || "Đăng ký sự kiện thất bại",
+      });
     }
   };
 
@@ -170,14 +193,23 @@ const EventDetailPage = () => {
     try {
       const response = await eventService.checkinEvent(id);
       if (response.success) {
-        message.success("Check-in thành công!");
+        messageApi.open({
+          type: "success",
+          content: "Check-in thành công!",
+        });
         setIsCheckedIn(true);
         fetchEventDetails();
       } else {
-        message.error(response.message || "Check-in thất bại");
+        messageApi.open({
+          type: "error",
+          content: response.message || "Check-in thất bại",
+        });
       }
     } catch (error: any) {
-      message.error(error.response?.data?.message || "Check-in thất bại");
+      messageApi.open({
+        type: "error",
+        content: error.response?.data?.message || "Check-in thất bại",
+      });
     }
   };
 
@@ -188,16 +220,25 @@ const EventDetailPage = () => {
         comment: values.comment,
       });
       if (response.success) {
-        message.success("Gửi đánh giá thành công!");
+        messageApi.open({
+          type: "success",
+          content: "Gửi đánh giá thành công!",
+        });
         setHasSubmittedFeedback(true);
         setIsFeedbackModalVisible(false);
         feedbackForm.resetFields();
         fetchEventDetails();
       } else {
-        message.error(response.message || "Gửi đánh giá thất bại");
+        messageApi.open({
+          type: "error",
+          content: response.message || "Gửi đánh giá thất bại",
+        });
       }
     } catch (error: any) {
-      message.error(error.response?.data?.message || "Gửi đánh giá thất bại");
+      messageApi.open({
+        type: "error",
+        content: error.response?.data?.message || "Gửi đánh giá thất bại",
+      });
     }
   };
 
@@ -243,16 +284,24 @@ const EventDetailPage = () => {
       });
 
       if (response.success) {
-        message.success(response.message || "Gửi thông báo thành công");
+        messageApi.open({
+          type: "success",
+          content: response.message || "Gửi thông báo thành công",
+        });
         setIsNotificationModalVisible(false);
         fetchEventDetails();
       } else {
-        message.error(response.message || "Không thể gửi thông báo");
+        messageApi.open({
+          type: "error",
+          content: response.message || "Không thể gửi thông báo",
+        });
       }
     } catch (error: any) {
-      message.error(
-        error.response?.data?.message || "Đã xảy ra lỗi khi gửi thông báo"
-      );
+      messageApi.open({
+        type: "error",
+        content:
+          error.response?.data?.message || "Đã xảy ra lỗi khi gửi thông báo",
+      });
     }
   };
 
@@ -260,15 +309,22 @@ const EventDetailPage = () => {
     try {
       const response = await eventService.approveEvent(id);
       if (response.success) {
-        message.success("Kích hoạt sự kiện thành công!");
+        messageApi.open({
+          type: "success",
+          content: "Kích hoạt sự kiện thành công!",
+        });
         fetchEventDetails();
       } else {
-        message.error(response.message || "Không thể kích hoạt sự kiện");
+        messageApi.open({
+          type: "error",
+          content: response.message || "Không thể kích hoạt sự kiện",
+        });
       }
     } catch (error: any) {
-      message.error(
-        error.response?.data?.message || "Không thể kích hoạt sự kiện"
-      );
+      messageApi.open({
+        type: "error",
+        content: error.response?.data?.message || "Không thể kích hoạt sự kiện",
+      });
     }
   };
 
@@ -314,33 +370,47 @@ const EventDetailPage = () => {
       });
 
       if (response.success) {
-        message.success("Cập nhật sự kiện thành công!");
+        messageApi.open({
+          type: "success",
+          content: "Cập nhật sự kiện thành công!",
+        });
         setIsEditModalVisible(false);
         fetchEventDetails();
       } else {
-        message.error(response.message || "Không thể cập nhật sự kiện");
+        messageApi.open({
+          type: "error",
+          content: response.message || "Không thể cập nhật sự kiện",
+        });
       }
     } catch (error: any) {
-      message.error(
-        error.response?.data?.message || "Không thể cập nhật sự kiện"
-      );
+      messageApi.open({
+        type: "error",
+        content: error.response?.data?.message || "Không thể cập nhật sự kiện",
+      });
     }
   };
 
   const beforeUpload = (file: RcFile) => {
     const isImage = file.type.startsWith("image/");
     if (!isImage) {
-      message.error("Bạn chỉ có thể tải lên file ảnh!");
+      messageApi.open({
+        type: "error",
+        content: "Bạn chỉ có thể tải lên file ảnh!",
+      });
     }
     const isLt2M = file.size / 1024 / 1024 < 2;
     if (!isLt2M) {
-      message.error("Ảnh phải nhỏ hơn 2MB!");
+      messageApi.open({
+        type: "error",
+        content: "Ảnh phải nhỏ hơn 2MB!",
+      });
     }
     return isImage && isLt2M;
   };
 
   return (
     <div className="min-h-screen bg-gray-50">
+      {contextHolder}
       {/* Event Banner */}
       <div className="relative h-96 w-full">
         <img

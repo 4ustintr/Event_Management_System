@@ -10,6 +10,7 @@ const { Title, Text } = Typography;
 const RegisterPage = () => {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
+  const [messageApi, contextHolder] = message.useMessage();
 
   const onFinish = async (values: {
     email: string;
@@ -22,7 +23,10 @@ const RegisterPage = () => {
 
     // Kiểm tra email của CLB phải có đuôi .clb
     if (role === "club" && !email.endsWith("@club.clb")) {
-      message.error("Email của CLB phải có đuôi @club.clb!");
+      messageApi.open({
+        type: "error",
+        content: "Email của CLB phải có đuôi @club.clb!",
+      });
       return;
     }
 
@@ -33,16 +37,22 @@ const RegisterPage = () => {
         password,
         full_name,
         phone,
-        roles: [{ role_name: role as "student" | "club" | "admin" }], // Changed to match User interface
+        roles: [{ role_name: role as "student" | "club" | "admin" }],
       });
 
-      message.success("Đăng ký thành công! Vui lòng đăng nhập.");
+      messageApi.open({
+        type: "success",
+        content: "Đăng ký thành công! Vui lòng đăng nhập.",
+      });
       router.push("/login");
     } catch (error: any) {
       console.error("Registration failed:", error);
-      message.error(
-        error.response?.data?.message || "Đăng ký thất bại. Vui lòng thử lại!"
-      );
+      messageApi.open({
+        type: "error",
+        content:
+          error.response?.data?.message ||
+          "Đăng ký thất bại. Vui lòng thử lại!",
+      });
     } finally {
       setLoading(false);
     }
@@ -50,6 +60,7 @@ const RegisterPage = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
+      {contextHolder}
       <div className="w-full max-w-md">
         <Card
           className="shadow-xl border-0 rounded-lg overflow-hidden"

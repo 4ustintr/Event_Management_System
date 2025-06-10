@@ -31,6 +31,7 @@ const CreateEventPage = () => {
   const [form] = Form.useForm();
   const [submitting, setSubmitting] = useState(false);
   const [imageUrl, setImageUrl] = useState<string>("");
+  const [messageApi, contextHolder] = message.useMessage();
 
   // Type guard to check if the user object is a Club
   const isClubUser = (user: User | Club | null): user is Club => {
@@ -44,18 +45,23 @@ const CreateEventPage = () => {
     console.log("user object on mount:", user);
 
     if (!isAuthenticated) {
-      message.error("Vui lòng đăng nhập để tạo sự kiện");
+      messageApi.open({
+        type: "error",
+        content: "Vui lòng đăng nhập để tạo sự kiện",
+      });
       router.push("/login");
       return;
     }
 
     if (userRole !== "club") {
-      message.error("Chỉ CLB mới có thể tạo sự kiện");
+      messageApi.open({
+        type: "error",
+        content: "Chỉ CLB mới có thể tạo sự kiện",
+      });
       router.push("/");
       return;
     }
 
-    // Log user information when component mounts
     console.log("Current user:", user);
     console.log("User role:", userRole);
   }, [isAuthenticated, userRole, router, user]);
@@ -79,22 +85,25 @@ const CreateEventPage = () => {
       let actualUserEmail: string | undefined;
 
       if (userRole === "club") {
-        // If user is a club, the user object itself is the club data
-        const clubUser = user as Club; // Cast user to Club type
+        const clubUser = user as Club;
         if (!clubUser?._id || !clubUser?.club_name) {
-          message.error("Thông tin CLB không hợp lệ hoặc thiếu.");
+          messageApi.open({
+            type: "error",
+            content: "Thông tin CLB không hợp lệ hoặc thiếu.",
+          });
           return;
         }
         actualClubId = clubUser._id;
         actualClubName = clubUser.club_name;
         actualUserEmail = clubUser.email;
       } else {
-        // This case should ideally be prevented by useEffect, but for type safety
-        message.error("Chỉ CLB mới có thể tạo sự kiện.");
+        messageApi.open({
+          type: "error",
+          content: "Chỉ CLB mới có thể tạo sự kiện.",
+        });
         return;
       }
 
-      // Log user information before creating event
       console.log("Creating event for club:", {
         clubId: actualClubId,
         clubName: actualClubName,
@@ -133,16 +142,21 @@ const CreateEventPage = () => {
       const response = await eventService.createEvent(eventData);
       console.log("Event creation response:", response);
 
-      message.success("Sự kiện đã được tạo thành công!");
+      messageApi.open({
+        type: "success",
+        content: "Sự kiện đã được tạo thành công!",
+      });
       router.push("/events/manage");
     } catch (error: any) {
       console.error("Failed to create event:", error);
       console.error("Error details:", error.response?.data);
       console.error("Error status:", error.response?.status);
       console.error("Error headers:", error.response?.headers);
-      message.error(
-        error.response?.data?.message || "Có lỗi xảy ra khi tạo sự kiện."
-      );
+      messageApi.open({
+        type: "error",
+        content:
+          error.response?.data?.message || "Có lỗi xảy ra khi tạo sự kiện.",
+      });
     } finally {
       setSubmitting(false);
     }
@@ -150,11 +164,16 @@ const CreateEventPage = () => {
 
   const handleImageUpload = (info: any) => {
     if (info.file.status === "done") {
-      // In a real application, this would be the URL returned from the server
       setImageUrl("https://via.placeholder.com/800x400?text=Event+Banner");
-      message.success("Tải lên ảnh thành công");
+      messageApi.open({
+        type: "success",
+        content: "Tải lên ảnh thành công",
+      });
     } else if (info.file.status === "error") {
-      message.error("Có lỗi xảy ra khi tải lên ảnh");
+      messageApi.open({
+        type: "error",
+        content: "Có lỗi xảy ra khi tải lên ảnh",
+      });
     }
   };
 
@@ -164,6 +183,7 @@ const CreateEventPage = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      {contextHolder}
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="flex items-center mb-8">
           <Button

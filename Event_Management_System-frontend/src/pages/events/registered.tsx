@@ -51,6 +51,7 @@ const RegisteredEventsPage = () => {
   const [form] = Form.useForm();
   const [refreshKey, setRefreshKey] = useState(0);
   const [filteredEvents, setFilteredEvents] = useState<Event[]>([]);
+  const [messageApi, contextHolder] = message.useMessage();
 
   const fetchRegisteredEvents = async () => {
     try {
@@ -73,11 +74,17 @@ const RegisteredEventsPage = () => {
         setEvents(mappedEvents);
         setFilteredEvents(mappedEvents);
       } else {
-        message.error("Không thể tải danh sách sự kiện đã đăng ký");
+        messageApi.open({
+          type: "error",
+          content: "Không thể tải danh sách sự kiện đã đăng ký",
+        });
       }
     } catch (error) {
       console.error("Error fetching events:", error);
-      message.error("Đã xảy ra lỗi khi tải danh sách sự kiện đã đăng ký");
+      messageApi.open({
+        type: "error",
+        content: "Đã xảy ra lỗi khi tải danh sách sự kiện đã đăng ký",
+      });
     } finally {
       setLoading(false);
     }
@@ -85,13 +92,19 @@ const RegisteredEventsPage = () => {
 
   useEffect(() => {
     if (!isAuthenticated) {
-      message.error("Vui lòng đăng nhập để xem sự kiện đã đăng ký");
+      messageApi.open({
+        type: "error",
+        content: "Vui lòng đăng nhập để xem sự kiện đã đăng ký",
+      });
       router.push("/login");
       return;
     }
 
     if (userRole !== "student") {
-      message.error("Chỉ sinh viên mới có thể xem sự kiện đã đăng ký");
+      messageApi.open({
+        type: "error",
+        content: "Chỉ sinh viên mới có thể xem sự kiện đã đăng ký",
+      });
       router.push("/events");
       return;
     }
@@ -120,20 +133,32 @@ const RegisteredEventsPage = () => {
   }) => {
     const eventId = selectedEvent?._id;
     if (!eventId) {
-      message.error("Không tìm thấy thông tin sự kiện");
+      messageApi.open({
+        type: "error",
+        content: "Không tìm thấy thông tin sự kiện",
+      });
       return;
     }
     try {
       const response = await eventService.submitFeedback(eventId, feedbackData);
       if (response.success) {
-        message.success("Cảm ơn bạn đã gửi đánh giá!");
+        messageApi.open({
+          type: "success",
+          content: "Cảm ơn bạn đã gửi đánh giá!",
+        });
         setIsFeedbackModalVisible(false);
         setRefreshKey((prev) => prev + 1);
       } else {
-        message.error("Không thể gửi đánh giá");
+        messageApi.open({
+          type: "error",
+          content: "Không thể gửi đánh giá",
+        });
       }
     } catch (error) {
-      message.error("Đã xảy ra lỗi khi gửi đánh giá");
+      messageApi.open({
+        type: "error",
+        content: "Đã xảy ra lỗi khi gửi đánh giá",
+      });
     }
   };
 
@@ -155,13 +180,22 @@ const RegisteredEventsPage = () => {
     try {
       const response = await eventService.cancelEventRegistration(eventId);
       if (response.success) {
-        message.success("Hủy đăng ký sự kiện thành công");
+        messageApi.open({
+          type: "success",
+          content: "Hủy đăng ký sự kiện thành công",
+        });
         fetchRegisteredEvents();
       } else {
-        message.error("Không thể hủy đăng ký sự kiện");
+        messageApi.open({
+          type: "error",
+          content: "Không thể hủy đăng ký sự kiện",
+        });
       }
     } catch (error) {
-      message.error("Đã xảy ra lỗi khi hủy đăng ký sự kiện");
+      messageApi.open({
+        type: "error",
+        content: "Đã xảy ra lỗi khi hủy đăng ký sự kiện",
+      });
     }
   };
 
@@ -187,11 +221,17 @@ const RegisteredEventsPage = () => {
       });
 
       if (filtered.length === 0) {
-        message.info("Không tìm thấy sự kiện nào phù hợp với bộ lọc");
+        messageApi.open({
+          type: "info",
+          content: "Không tìm thấy sự kiện nào phù hợp với bộ lọc",
+        });
       }
       setFilteredEvents(filtered);
     } catch (error) {
-      message.error("Đã xảy ra lỗi khi lọc sự kiện");
+      messageApi.open({
+        type: "error",
+        content: "Đã xảy ra lỗi khi lọc sự kiện",
+      });
     }
   };
 
@@ -217,6 +257,7 @@ const RegisteredEventsPage = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      {contextHolder}
       <EventReminder />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <h1 className="text-3xl font-bold text-gray-900 mb-8">

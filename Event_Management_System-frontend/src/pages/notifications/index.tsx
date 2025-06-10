@@ -11,6 +11,7 @@ const NotificationsPage = () => {
   const { userRole, isAuthenticated } = useAuth();
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [loading, setLoading] = useState(true);
+  const [messageApi, contextHolder] = message.useMessage();
 
   const fetchMyNotifications = async () => {
     try {
@@ -19,7 +20,10 @@ const NotificationsPage = () => {
       setNotifications(data.notifications || []);
     } catch (error) {
       console.error("Failed to fetch notifications:", error);
-      message.error("Không thể tải danh sách thông báo.");
+      messageApi.open({
+        type: "error",
+        content: "Không thể tải danh sách thông báo.",
+      });
     } finally {
       setLoading(false);
     }
@@ -27,13 +31,19 @@ const NotificationsPage = () => {
 
   useEffect(() => {
     if (!isAuthenticated) {
-      message.error("Vui lòng đăng nhập để xem thông báo");
+      messageApi.open({
+        type: "error",
+        content: "Vui lòng đăng nhập để xem thông báo",
+      });
       router.push("/login");
       return;
     }
 
     if (userRole !== "student") {
-      message.error("Chỉ sinh viên mới có thể xem thông báo");
+      messageApi.open({
+        type: "error",
+        content: "Chỉ sinh viên mới có thể xem thông báo",
+      });
       router.push("/");
       return;
     }
@@ -50,6 +60,7 @@ const NotificationsPage = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      {contextHolder}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <h1 className="text-3xl font-bold text-gray-900 mb-8">Thông Báo</h1>
 

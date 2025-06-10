@@ -28,6 +28,7 @@ const EventManagement = () => {
   const [loading, setLoading] = useState(true);
   const [events, setEvents] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
+  const [messageApi, contextHolder] = message.useMessage();
 
   useEffect(() => {
     if (userRole !== "admin") {
@@ -45,11 +46,17 @@ const EventManagement = () => {
       if (response.success) {
         setEvents(response.data.events);
       } else {
-        message.error("Không thể tải danh sách sự kiện");
+        messageApi.open({
+          type: "error",
+          content: "Không thể tải danh sách sự kiện",
+        });
       }
     } catch (error) {
       console.error("Error fetching events:", error);
-      message.error("Có lỗi xảy ra khi tải danh sách sự kiện");
+      messageApi.open({
+        type: "error",
+        content: "Có lỗi xảy ra khi tải danh sách sự kiện",
+      });
     } finally {
       setLoading(false);
     }
@@ -59,15 +66,23 @@ const EventManagement = () => {
     try {
       const response = await eventService.deleteEvent(id);
       if (response.success) {
-        message.success("Xóa sự kiện thành công");
+        messageApi.open({
+          type: "success",
+          content: "Xóa sự kiện thành công",
+        });
         fetchEvents();
       } else {
-        message.error(response.message || "Không thể xóa sự kiện");
+        messageApi.open({
+          type: "error",
+          content: response.message || "Không thể xóa sự kiện",
+        });
       }
     } catch (error: any) {
-      message.error(
-        error.response?.data?.message || "Đã xảy ra lỗi khi xóa sự kiện"
-      );
+      messageApi.open({
+        type: "error",
+        content:
+          error.response?.data?.message || "Đã xảy ra lỗi khi xóa sự kiện",
+      });
     }
   };
 
@@ -75,15 +90,23 @@ const EventManagement = () => {
     try {
       const response = await eventService.approveEvent(id);
       if (response.success) {
-        message.success("Duyệt sự kiện thành công");
+        messageApi.open({
+          type: "success",
+          content: "Duyệt sự kiện thành công",
+        });
         fetchEvents();
       } else {
-        message.error(response.message || "Không thể duyệt sự kiện");
+        messageApi.open({
+          type: "error",
+          content: response.message || "Không thể duyệt sự kiện",
+        });
       }
     } catch (error: any) {
-      message.error(
-        error.response?.data?.message || "Đã xảy ra lỗi khi duyệt sự kiện"
-      );
+      messageApi.open({
+        type: "error",
+        content:
+          error.response?.data?.message || "Đã xảy ra lỗi khi duyệt sự kiện",
+      });
     }
   };
 
@@ -200,6 +223,7 @@ const EventManagement = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 py-8">
+      {contextHolder}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center mb-8">
           <h1 className="text-3xl font-bold text-gray-900">Quản lý sự kiện</h1>

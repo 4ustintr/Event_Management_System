@@ -55,6 +55,7 @@ const EventManagePage = () => {
   const [filteredEvents, setFilteredEvents] = useState<Event[]>([]);
   const [isEditModalVisible, setIsEditModalVisible] = useState(false);
   const [editLoading, setEditLoading] = useState(false);
+  const [messageApi, contextHolder] = message.useMessage();
 
   const handleEventClick = (event: Event) => {
     router.push(`/events/${event._id}`);
@@ -64,7 +65,10 @@ const EventManagePage = () => {
     try {
       setLoading(true);
       if (!user) {
-        message.error("Không tìm thấy thông tin club");
+        messageApi.open({
+          type: "error",
+          content: "Không tìm thấy thông tin club",
+        });
         return;
       }
 
@@ -78,12 +82,18 @@ const EventManagePage = () => {
         setEvents(response.data.events);
       } else {
         console.error("Invalid response format:", response);
-        message.error("Không thể tải danh sách sự kiện");
+        messageApi.open({
+          type: "error",
+          content: "Không thể tải danh sách sự kiện",
+        });
         setEvents([]);
       }
     } catch (error) {
       console.error("Error fetching events:", error);
-      message.error("Có lỗi xảy ra khi tải danh sách sự kiện");
+      messageApi.open({
+        type: "error",
+        content: "Có lỗi xảy ra khi tải danh sách sự kiện",
+      });
       setEvents([]);
     } finally {
       setLoading(false);
@@ -92,13 +102,19 @@ const EventManagePage = () => {
 
   useEffect(() => {
     if (!isAuthenticated) {
-      message.error("Vui lòng đăng nhập để quản lý sự kiện");
+      messageApi.open({
+        type: "error",
+        content: "Vui lòng đăng nhập để quản lý sự kiện",
+      });
       router.push("/login");
       return;
     }
 
     if (userRole !== "club") {
-      message.error("Chỉ CLB mới có thể quản lý sự kiện");
+      messageApi.open({
+        type: "error",
+        content: "Chỉ CLB mới có thể quản lý sự kiện",
+      });
       router.push("/");
       return;
     }
@@ -108,7 +124,10 @@ const EventManagePage = () => {
 
   const handleDelete = async () => {
     if (!selectedEvent?._id) {
-      message.error("Không tìm thấy thông tin sự kiện");
+      messageApi.open({
+        type: "error",
+        content: "Không tìm thấy thông tin sự kiện",
+      });
       return;
     }
     try {
@@ -118,15 +137,20 @@ const EventManagePage = () => {
         message: `Sự kiện "${selectedEvent.title}" đã bị xóa bởi CLB.`,
         type: "announcement",
       });
-      message.success("Xóa sự kiện thành công!");
+      messageApi.open({
+        type: "success",
+        content: "Xóa sự kiện thành công!",
+      });
       setIsDeleteModalVisible(false);
       setSelectedEvent(null);
       fetchClubEvents();
     } catch (error: any) {
       console.error("Failed to delete event:", error);
-      message.error(
-        error.response?.data?.message || "Có lỗi xảy ra khi xóa sự kiện."
-      );
+      messageApi.open({
+        type: "error",
+        content:
+          error.response?.data?.message || "Có lỗi xảy ra khi xóa sự kiện.",
+      });
     }
   };
 
@@ -155,14 +179,23 @@ const EventManagePage = () => {
       });
 
       if (response.success) {
-        message.success("Gửi thông báo thành công");
+        messageApi.open({
+          type: "success",
+          content: "Gửi thông báo thành công",
+        });
         setIsNotificationModalVisible(false);
         fetchClubEvents();
       } else {
-        message.error("Không thể gửi thông báo");
+        messageApi.open({
+          type: "error",
+          content: "Không thể gửi thông báo",
+        });
       }
     } catch (error) {
-      message.error("Đã xảy ra lỗi khi gửi thông báo");
+      messageApi.open({
+        type: "error",
+        content: "Đã xảy ra lỗi khi gửi thông báo",
+      });
     }
   };
 
@@ -184,10 +217,16 @@ const EventManagePage = () => {
       });
       setFilteredEvents(filtered);
       if (filtered.length === 0) {
-        message.info("Không tìm thấy sự kiện nào phù hợp với bộ lọc");
+        messageApi.open({
+          type: "info",
+          content: "Không tìm thấy sự kiện nào phù hợp với bộ lọc",
+        });
       }
     } catch (error) {
-      message.error("Đã xảy ra lỗi khi lọc sự kiện");
+      messageApi.open({
+        type: "error",
+        content: "Đã xảy ra lỗi khi lọc sự kiện",
+      });
     }
   };
 
@@ -245,16 +284,23 @@ const EventManagePage = () => {
       });
 
       if (response.success) {
-        message.success("Cập nhật sự kiện thành công!");
+        messageApi.open({
+          type: "success",
+          content: "Cập nhật sự kiện thành công!",
+        });
         setIsEditModalVisible(false);
         fetchClubEvents();
       } else {
-        message.error(response.message || "Không thể cập nhật sự kiện");
+        messageApi.open({
+          type: "error",
+          content: response.message || "Không thể cập nhật sự kiện",
+        });
       }
     } catch (error: any) {
-      message.error(
-        error.response?.data?.message || "Không thể cập nhật sự kiện"
-      );
+      messageApi.open({
+        type: "error",
+        content: error.response?.data?.message || "Không thể cập nhật sự kiện",
+      });
     } finally {
       setEditLoading(false);
     }
@@ -270,6 +316,7 @@ const EventManagePage = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      {contextHolder}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-8">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 sm:mb-8">
           <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
@@ -410,7 +457,7 @@ const EventManagePage = () => {
                       {getStatusText(event.status)}
                     </Tag>
                   </div>
-                  
+
                   <div className="space-y-2">
                     <div className="flex items-center text-gray-500">
                       <CalendarOutlined className="mr-2" />

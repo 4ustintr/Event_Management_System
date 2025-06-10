@@ -39,16 +39,23 @@ const StudentDashboard = () => {
   const [loading, setLoading] = useState(true);
   const [dashboardData, setDashboardData] = useState<any>(null);
   const [events, setEvents] = useState<any[]>([]);
+  const [messageApi, contextHolder] = message.useMessage();
 
   useEffect(() => {
     if (!isAuthenticated) {
-      message.error("Vui lòng đăng nhập để truy cập trang này");
+      messageApi.open({
+        type: "error",
+        content: "Vui lòng đăng nhập để truy cập trang này",
+      });
       router.push("/login");
       return;
     }
 
     if (userRole !== "student") {
-      message.error("Bạn không có quyền truy cập trang này");
+      messageApi.open({
+        type: "error",
+        content: "Bạn không có quyền truy cập trang này",
+      });
       router.push("/");
       return;
     }
@@ -73,7 +80,10 @@ const StudentDashboard = () => {
       }
     } catch (error) {
       console.error("Failed to fetch dashboard data:", error);
-      message.error("Không thể tải dữ liệu dashboard");
+      messageApi.open({
+        type: "error",
+        content: "Không thể tải dữ liệu dashboard",
+      });
     } finally {
       setLoading(false);
     }
@@ -85,7 +95,6 @@ const StudentDashboard = () => {
       const response = await eventService.getMyEventHistory();
       console.log("Event history response:", response);
       if (response && response.success) {
-        // Map the history data to include event details
         const mappedEvents = response.data.history.map((item: any) => ({
           ...item.event,
           is_checked_in: item.checked_in,
@@ -97,12 +106,18 @@ const StudentDashboard = () => {
         console.log("Mapped events:", mappedEvents);
         setEvents(mappedEvents);
       } else {
-        message.error("Không thể tải lịch sử sự kiện");
+        messageApi.open({
+          type: "error",
+          content: "Không thể tải lịch sử sự kiện",
+        });
         setEvents([]);
       }
     } catch (error) {
       console.error("Error fetching event history:", error);
-      message.error("Có lỗi xảy ra khi tải lịch sử sự kiện");
+      messageApi.open({
+        type: "error",
+        content: "Có lỗi xảy ra khi tải lịch sử sự kiện",
+      });
       setEvents([]);
     } finally {
       setLoading(false);
@@ -122,10 +137,16 @@ const StudentDashboard = () => {
   const handleSaveProfile = async (values: any) => {
     try {
       // TODO: Call API to update user profile
-      message.success("Cập nhật thông tin thành công!");
+      messageApi.open({
+        type: "success",
+        content: "Cập nhật thông tin thành công!",
+      });
       setIsEditModalVisible(false);
     } catch (error) {
-      message.error("Có lỗi xảy ra khi cập nhật thông tin!");
+      messageApi.open({
+        type: "error",
+        content: "Có lỗi xảy ra khi cập nhật thông tin!",
+      });
     }
   };
 
@@ -181,6 +202,7 @@ const StudentDashboard = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      {contextHolder}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <h1 className="text-3xl font-bold text-gray-900 mb-8">
           Bảng Điều Khiển Sinh Viên

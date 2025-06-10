@@ -1,0 +1,5 @@
+node_modules
+.env
+Event_Management_System.postman_collection.json
+API_Testing_Guide.md
+.early.coverage

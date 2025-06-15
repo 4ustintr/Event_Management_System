@@ -57,10 +57,6 @@ const EventManagePage = () => {
   const [editLoading, setEditLoading] = useState(false);
   const [messageApi, contextHolder] = message.useMessage();
 
-  const handleEventClick = (event: Event) => {
-    router.push(`/events/${event._id}`);
-  };
-
   const fetchClubEvents = async () => {
     try {
       setLoading(true);
@@ -122,15 +118,13 @@ const EventManagePage = () => {
       return;
     }
     try {
-      // <<<--- BƯỚC 1: GỬI THÔNG BÁO TRƯỚC
-      // Gửi thông báo rằng sự kiện sắp bị xóa, lúc này sự kiện vẫn còn trong DB
+      // Gửi thông báo rằng sự kiện sắp bị xóa
       await notificationService.sendEventNotification(selectedEvent._id, {
         title: "Sự kiện đã bị xóa",
         message: `Sự kiện "${selectedEvent.title}" đã bị xóa bởi CLB.`,
         type: "announcement",
       });
 
-      // <<<--- BƯỚC 2: SAU KHI GỬI THÔNG BÁO THÀNH CÔNG, TIẾN HÀNH XÓA SỰ KIỆN
       await eventService.deleteEvent(selectedEvent._id);
 
       messageApi.open({
@@ -195,30 +189,7 @@ const EventManagePage = () => {
     }
   };
 
-  const handleFilter = () => {
-    try {
-      const filtered = events.filter((event) => {
-        const matchesSearch = event.title
-          .toLowerCase()
-          .includes(searchTerm.toLowerCase());
-        const matchesCategory =
-          !selectedCategory || event.category === selectedCategory;
-        const matchesStatus =
-          !selectedStatus || event.status === selectedStatus;
-        const matchesDate =
-          !dateRange ||
-          (dayjs(event.start_time).isAfter(dateRange[0]) &&
-            dayjs(event.end_time).isBefore(dateRange[1]));
-        return matchesSearch && matchesCategory && matchesStatus && matchesDate;
-      });
-      setFilteredEvents(filtered);
-      if (filtered.length === 0) {
-        message.info("Không tìm thấy sự kiện nào phù hợp với bộ lọc");
-      }
-    } catch (error) {
-      message.error("Đã xảy ra lỗi khi lọc sự kiện");
-    }
-  };
+
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -291,6 +262,7 @@ const EventManagePage = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      {contextHolder}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-8">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 sm:mb-8">
           <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">

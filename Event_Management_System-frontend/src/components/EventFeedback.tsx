@@ -47,6 +47,8 @@ const EventFeedback = ({
   
 
   return (
+    <>
+      {contextHolder}
     <Modal
       title="Đánh giá sự kiện"
       open={isVisible}
@@ -80,7 +82,8 @@ const EventFeedback = ({
         </Form.Item>
       </Form>
     </Modal>
-  );
+  </>
+);
 };
 
 export default EventFeedback;

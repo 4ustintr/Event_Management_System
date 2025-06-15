@@ -130,7 +130,6 @@ const CreateEventPage = () => {
   const uploadProps: UploadProps = {
     // Dùng onChange để cập nhật danh sách file, đây là cách làm chuẩn
     onChange: (info) => {
-      // Giới hạn chỉ lấy file cuối cùng người dùng chọn
       let newFileList = info.fileList.slice(-1);
       setFileList(newFileList);
     },
@@ -153,7 +152,7 @@ const CreateEventPage = () => {
       // return false là BẮT BUỘC
       return isJpgOrPng && isLt5M ? false : Upload.LIST_IGNORE;
     },
-    fileList, // Lấy giá trị từ state để component được kiểm soát
+    fileList, 
     maxCount: 1,
     listType: "picture-card",
   };
@@ -161,6 +160,7 @@ const CreateEventPage = () => {
 
   return (
     <div className="max-w-4xl mx-auto p-6 bg-white rounded-lg shadow-md mt-10">
+    {contextHolder}
       <Button
         type="text"
         icon={<ArrowLeftOutlined />}

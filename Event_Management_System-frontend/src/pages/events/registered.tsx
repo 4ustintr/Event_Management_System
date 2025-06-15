@@ -10,10 +10,7 @@ import {
   Form,
   Rate,
   Spin,
-  Tag,
-  Row,
-  Col,
-  Descriptions,
+
 } from "antd";
 import { eventService } from "@/api/services/event.service";
 import { Event } from "@/types/api.types";
@@ -153,43 +150,7 @@ const RegisteredEventsPage = () => {
     }
   };
 
-  const getEventRating = (eventId: string | undefined) => {
-    if (!eventId) return 0;
-    const event = events.find((e) => e._id === eventId);
-    if (event && (event as any).average_rating) {
-      return (event as any).average_rating;
-    }
-    const eventRatings = ratings.filter((r) => r.eventId === eventId);
-    if (eventRatings.length === 0) return 0;
-    const averageRating =
-      eventRatings.reduce((acc, curr) => acc + curr.rating, 0) /
-      eventRatings.length;
-    return averageRating;
-  };
-
-  const handleCancelRegistration = async (eventId: string) => {
-    try {
-      const response = await eventService.cancelEventRegistration(eventId);
-      if (response.success) {
-        messageApi.open({
-          type: "success",
-          content: "Đã hủy đăng ký sự kiện thành công",
-        });
-        fetchRegisteredEvents();
-      } else {
-        messageApi.open({
-          type: "error",
-          content: "Không thể hủy đăng ký sự kiện",
-        });
-      }
-    } catch (error) {
-      messageApi.open({
-        type: "error",
-        content: "Đã xảy ra lỗi khi hủy đăng ký sự kiện",
-      });
-    }
-  };
-
+  
   const handleFilter = () => {
     try {
       const filtered = events.filter((event) => {

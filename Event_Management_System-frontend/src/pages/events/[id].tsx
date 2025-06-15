@@ -66,7 +66,7 @@ const EventDetailPage = () => {
       if (response && response.event) {
         setEvent(response.event);
 
-        // === THAY ĐỔI LOGIC TRONG KHỐI LỆNH `if` NÀY ===
+        
         if (user?._id && response.event.registrations) {
           const registration = response.event.registrations.find(
             (reg: any) => reg.user_id === user._id
@@ -324,50 +324,8 @@ const EventDetailPage = () => {
     }
   };
 
-  const handleActivateEvent = async () => {
-    try {
-      const response = await eventService.approveEvent(id);
-      if (response.success) {
-        messageApi.open({
-          type: "success",
-          content: "Kích hoạt sự kiện thành công!",
-        });
-        fetchEventDetails();
-      } else {
-        messageApi.open({
-          type: "error",
-          content: response.message || "Không thể kích hoạt sự kiện",
-        });
-      }
-    } catch (error: any) {
-      messageApi.open({
-        type: "error",
-        content: error.response?.data?.message || "Không thể kích hoạt sự kiện",
-      });
-    }
-  };
 
-  const handleEdit = () => {
-    editForm.setFieldsValue({
-      title: event?.title,
-      description: event?.description,
-      location: event?.location,
-      max_participants: event?.max_participants,
-      start_time: event?.start_time ? dayjs(event.start_time) : null,
-      end_time: event?.end_time ? dayjs(event.end_time) : null,
-    });
-    if (event?.banner_url) {
-      setFileList([
-        {
-          uid: "-1",
-          name: "banner.png",
-          status: "done",
-          url: event.banner_url,
-        },
-      ]);
-    }
-    setIsEditModalVisible(true);
-  };
+
 
   const handleEditSubmit = async (values: any) => {
     if (!id) {

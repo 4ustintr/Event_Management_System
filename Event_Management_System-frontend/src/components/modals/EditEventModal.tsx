@@ -103,6 +103,8 @@ const EditEventModal = ({
   };
 
   return (
+    <>
+      {contextHolder}
       <Modal
         title="Chỉnh Sửa Sự Kiện"
         open={visible}
@@ -199,6 +201,7 @@ const EditEventModal = ({
           </Form.Item>
         </Form>
       </Modal>
+    </>
   );
 };
 
